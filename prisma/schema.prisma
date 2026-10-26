@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Photo {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  location      String?
+  dateTaken     DateTime?
+  camera        String?
+  lens          String?
+  settings      String?  // "f/2.8 1/250s ISO100"
+  originalPath  String   // relative to uploads/
+  thumbnailPath String?
+  mediumPath    String?
+  largePath     String?
+  width         Int
+  height        Int
+  fileSize      Int
+  format        String   // jpg, png, etc.
+  order         Int      @default(0)
+  isPublished   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  seriesId      String?
+  series        Series?  @relation(fields: [seriesId], references: [id])
+  
+  @@index([seriesId, order])
+  @@index([isPublished, order])
+}
+
+model Series {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String?
+  description String?
+  coverPhotoId String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  photos      Photo[]
+  
+  @@index([isPublished, order])
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String   // Markdown
+  isPublished Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     String   // Markdown
+  coverImageId String?
+  tags        String?  // comma-separated
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Award {
+  id           String   @id @default(cuid())
+  title        String
+  year         Int
+  organization String?
+  level        String?  // global, asia, national, regional
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteConfig {
+  id          String   @id @default("site")
+  siteName    String   @default("Gallery")
+  authorName  String   @default("Photographer")
+  bio         String?
+  avatarPath  String?
+  socialLinks String?  // JSON: {weibo: "...", instagram: "...", ...}
+  seoTitle    String?
+  seoDesc     String?
+  seoKeywords String?
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
