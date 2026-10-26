@@ -15,11 +15,11 @@ export default async function Home() {
   ])
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="relative h-screen flex items-center justify-center">
-        <div className="absolute inset-0 z-0">
-          {series[0]?.photos[0] && (
+        {series[0]?.photos[0] && (
+          <div className="absolute inset-0 z-0">
             <Image
               src={`/api/files/${series[0].photos[0].largePath}`}
               alt={series[0].title}
@@ -27,9 +27,9 @@ export default async function Home() {
               className="object-cover opacity-60"
               priority
             />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black" />
-        </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-background" />
+          </div>
+        )}
         <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-7xl font-light tracking-tight mb-4">
             {config?.authorName || 'Photographer'}

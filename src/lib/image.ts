@@ -17,6 +17,7 @@ export interface ProcessedImage {
 
 export async function ensureUploadDir() {
   await fs.mkdir(UPLOAD_DIR, { recursive: true })
+  await fs.mkdir(path.join(UPLOAD_DIR, 'originals'), { recursive: true })
   await fs.mkdir(path.join(UPLOAD_DIR, 'thumbnails'), { recursive: true })
   await fs.mkdir(path.join(UPLOAD_DIR, 'medium'), { recursive: true })
   await fs.mkdir(path.join(UPLOAD_DIR, 'large'), { recursive: true })
@@ -28,10 +29,10 @@ export async function processImage(
 ): Promise<ProcessedImage> {
   await ensureUploadDir()
 
-  const ext = path.extname(filename).toLowerCase().replace('.', '')
+  const ext = path.extname(filename).toLowerCase().replace('.', '') || 'jpg'
   const baseName = path.basename(filename, path.extname(filename))
   const timestamp = Date.now()
-  const safeName = `${baseName}-${timestamp}`
+  const safeName = `${baseName}-${timestamp}`.replace(/[^a-zA-Z0-9-_]/g, '_')
 
   // Get metadata
   const metadata = await sharp(buffer).metadata()
@@ -92,8 +93,4 @@ export async function deleteImageFiles(paths: {
       }
     }
   }
-}
-
-export function getUploadUrl(filePath: string): string {
-  return `/api/files/${filePath}`
 }

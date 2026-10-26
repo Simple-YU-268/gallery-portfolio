@@ -11,13 +11,15 @@ export default async function SeriesPage({
 }) {
   const series = await prisma.series.findUnique({
     where: { slug: params.slug, isPublished: true },
-    include: { photos: { where: { isPublished: true }, orderBy: { order: 'asc' } } },
+    include: {
+      photos: { where: { isPublished: true }, orderBy: { order: 'asc' } },
+    },
   })
 
   if (!series) notFound()
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <section className="relative h-[60vh] flex items-end">
         {series.photos[0] && (
@@ -29,11 +31,13 @@ export default async function SeriesPage({
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
           </div>
         )}
         <div className="relative z-10 max-w-7xl mx-auto px-4 pb-16 w-full">
-          <h1 className="text-4xl md:text-6xl font-light mb-2">{series.title}</h1>
+          <h1 className="text-4xl md:text-6xl font-light mb-2">
+            {series.title}
+          </h1>
           {series.subtitle && (
             <p className="text-xl text-white/70 font-light">{series.subtitle}</p>
           )}
@@ -53,7 +57,10 @@ export default async function SeriesPage({
       <section className="max-w-7xl mx-auto px-4 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {series.photos.map((photo) => (
-            <div key={photo.id} className="group relative aspect-[4/3] overflow-hidden bg-neutral-900">
+            <div
+              key={photo.id}
+              className="group relative aspect-[4/3] overflow-hidden bg-neutral-900"
+            >
               <Image
                 src={`/api/files/${photo.mediumPath}`}
                 alt={photo.title}
@@ -64,7 +71,9 @@ export default async function SeriesPage({
                 <div>
                   <h3 className="text-lg font-medium">{photo.title}</h3>
                   {photo.location && (
-                    <p className="text-sm text-white/70 mt-1">{photo.location}</p>
+                    <p className="text-sm text-white/70 mt-1">
+                      {photo.location}
+                    </p>
                   )}
                 </div>
               </div>
