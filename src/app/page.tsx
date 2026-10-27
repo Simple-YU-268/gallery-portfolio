@@ -72,6 +72,26 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Nav */}
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/80 to-transparent">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <Link href="/" className="text-lg font-light">
+            {config?.siteName || 'Gallery'}
+          </Link>
+          <div className="flex gap-6 text-sm">
+            <Link href="/" className="text-white/70 hover:text-white transition-colors">
+              Home
+            </Link>
+            <Link href="/about" className="text-white/70 hover:text-white transition-colors">
+              About
+            </Link>
+            <Link href="/admin" className="text-white/70 hover:text-white transition-colors">
+              Admin
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Footer */}
       <footer className="border-t border-neutral-800 py-12 text-center text-neutral-500 text-sm">
         <p>© {new Date().getFullYear()} {config?.authorName || 'Photographer'}</p>

@@ -130,12 +130,51 @@ export default function AdminPage() {
             <h2 className="text-xl mb-4">Photos ({photos.length})</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {photos.map((photo) => (
-                <div key={photo.id} className="bg-card rounded overflow-hidden">
-                  <img
-                    src={`/api/files/${photo.thumbnailPath}`}
-                    alt={photo.title}
-                    className="w-full aspect-square object-cover"
-                  />
+                <div key={photo.id} className="bg-card rounded overflow-hidden group">
+                  <div className="relative">
+                    <img
+                      src={`/api/files/${photo.thumbnailPath}`}
+                      alt={photo.title}
+                      className="w-full aspect-square object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => {
+                          const title = prompt('Title:', photo.title)
+                          if (title === null) return
+                          const location = prompt('Location:', photo.location || '')
+                          const key = localStorage.getItem('admin_key')
+                          fetch(`/api/photos/${photo.id}`, {
+                            method: 'PUT',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: `Bearer ${key}`,
+                            },
+                            body: JSON.stringify({
+                              title,
+                              location: location || null,
+                            }),
+                          }).then(() => loadData())
+                        }}
+                        className="px-3 py-1 bg-accent text-accent-foreground rounded text-xs"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!confirm('Delete this photo?')) return
+                          const key = localStorage.getItem('admin_key')
+                          fetch(`/api/photos/${photo.id}`, {
+                            method: 'DELETE',
+                            headers: { Authorization: `Bearer ${key}` },
+                          }).then(() => loadData())
+                        }}
+                        className="px-3 py-1 bg-red-600 text-white rounded text-xs"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
                   <div className="p-2">
                     <p className="text-sm truncate">{photo.title}</p>
                     <p className="text-xs text-neutral-500">
@@ -150,7 +189,33 @@ export default function AdminPage() {
 
         {activeTab === 'series' && (
           <div>
-            <h2 className="text-xl mb-4">Series ({series.length})</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl">Series ({series.length})</h2>
+              <button
+                onClick={() => {
+                  const title = prompt('Series title:')
+                  const slug = prompt('Slug (URL-friendly, e.g. "tibet-train"):')
+                  if (!title || !slug) return
+                  const key = localStorage.getItem('admin_key')
+                  fetch('/api/series', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${key}`,
+                    },
+                    body: JSON.stringify({
+                      title,
+                      slug,
+                      isPublished: false,
+                      order: series.length,
+                    }),
+                  }).then(() => loadData())
+                }}
+                className="px-4 py-2 bg-accent text-accent-foreground rounded text-sm"
+              >
+                + New Series
+              </button>
+            </div>
             <div className="space-y-2">
               {series.map((s) => (
                 <div
@@ -161,9 +226,23 @@ export default function AdminPage() {
                     <p className="font-medium">{s.title}</p>
                     <p className="text-sm text-neutral-500">/{s.slug}</p>
                   </div>
-                  <span className="text-sm text-neutral-400">
-                    {s._count?.photos || 0} photos
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-neutral-400">
+                      {s._count?.photos || 0} photos
+                    </span>
+                    <button
+                      onClick={() => {
+                        const key = localStorage.getItem('admin_key')
+                        fetch(`/api/series/${s.id}`, {
+                          method: 'DELETE',
+                          headers: { Authorization: `Bearer ${key}` },
+                        }).then(() => loadData())
+                      }}
+                      className="text-red-400 hover:text-red-300 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
